@@ -86,7 +86,7 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
                   ListTile(
                     leading: Icon(Icons.add_circle),
                     title: Text(
-                        'JUNE 2021 - FOURTH WEEK ( 25/07/2021 - 31/07/2021 )'),
+                        'JUNE 2021 - THIRD WEEK ( 25/07/2021 - 31/07/2021 )'),
                     trailing: Icon(Icons.delete),
                     onTap: () {
                       //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));
@@ -97,7 +97,7 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
                   ListTile(
                     leading: Icon(Icons.add_circle),
                     title: Text(
-                        'JUNE 2021 - FOURTH WEEK ( 25/07/2021 - 31/07/2021 )'),
+                        'JUNE 2021 - SECOND WEEK ( 25/07/2021 - 31/07/2021 )'),
                     trailing: Icon(Icons.delete),
                     onTap: () {
                       //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));

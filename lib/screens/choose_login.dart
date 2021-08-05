@@ -44,7 +44,11 @@ class _ChooseLoginState extends State<ChooseLogin> {
                           children: [
                             SizedBox(
                               height:100,
-                              child: Text("imtac",style: TextStyle(color: Colors.greenAccent,fontWeight: FontWeight.bold,fontSize: 35),)
+                              width: 200,
+                              child: Image.asset(
+                                'assets/images/GC5-imtac.png',
+                              ),
+                              //child: Text("imtac",style: TextStyle(color: Colors.greenAccent,fontWeight: FontWeight.bold,fontSize: 35),)
                             ),
                           ],
                         ),
