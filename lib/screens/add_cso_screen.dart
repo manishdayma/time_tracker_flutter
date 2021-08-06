@@ -94,19 +94,83 @@ class _AddCSOScreenState extends State<AddCSOScreen> {
                             ),
                           ),
                         ],
-                      ),
+                      ),SizedBox(height: 20,),
                       Row(
                         children: [
                           Flexible(
                             flex: 5,
-                            child: Container(
+                            child:TextField(
+                              readOnly: false,
+                              decoration: InputDecoration(
+                                hintText: 'Email ID',
+                                icon: Icon(Icons.email_sharp),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
+                            flex: 5,
+                            child: TextField(
+                              readOnly: false,
+                              decoration: InputDecoration(
+                                hintText: 'Name',
+                                icon: Icon(Icons.person),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),SizedBox(height: 20,),
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 5,
+                            child: TextField(
+                              readOnly: true,
+                              controller: dateController,
+                              decoration: InputDecoration(
+                                hintText: 'Reported on',
+                                icon: Icon(Icons.calendar_today_outlined),
+                              ),
+                              onTap: () async {
+                                var date = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1950),
+                                    lastDate: DateTime(2100));
+                                dateController.text =
+                                    date.toString().substring(0, 10);
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
+                            flex: 5,
+                            child: TextField(
+                              readOnly: false,
+                              decoration: InputDecoration(
+                                hintText: 'Mobile No.',
+                                icon: Icon(Icons.phone_android),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),SizedBox(height: 20,),
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 5,
+                            child:   Container(
 //margin: EdgeInsets.symmetric(vertical: 10),
                               decoration: ShapeDecoration(
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
                                       width: 1.0, style: BorderStyle.solid),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
+                                  BorderRadius.all(Radius.circular(5.0)),
                                 ),
                               ),
                               child: DropdownButton<String>(
@@ -132,70 +196,6 @@ class _AddCSOScreenState extends State<AddCSOScreen> {
                           ),
                           Flexible(
                             flex: 5,
-                            child: TextField(
-                              readOnly: false,
-                              decoration: InputDecoration(
-                                hintText: 'Customer Name',
-                                icon: Icon(Icons.person),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              readOnly: false,
-                              decoration: InputDecoration(
-                                hintText: 'Email ID',
-                                icon: Icon(Icons.email_sharp),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Flexible(
-                            flex: 5,
-                            child: TextField(
-                              readOnly: false,
-                              decoration: InputDecoration(
-                                hintText: 'Mobile No.',
-                                icon: Icon(Icons.phone_android),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Flexible(
-                            flex: 5,
-                            child:  TextField(
-                              readOnly: true,
-                              controller: dateController,
-                              decoration: InputDecoration(
-                                hintText: 'Reported on',
-                                icon: Icon(Icons.calendar_today_outlined),
-                              ),
-                              onTap: () async {
-                                var date = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1950),
-                                    lastDate: DateTime(2100));
-                                dateController.text =
-                                    date.toString().substring(0, 10);
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Flexible(
-                            flex: 5,
                             child:  TextField(
                               readOnly: false,
                               decoration: InputDecoration(
@@ -206,7 +206,7 @@ class _AddCSOScreenState extends State<AddCSOScreen> {
 
                           ),
                         ],
-                      ),
+                      ),SizedBox(height: 20,),
                       Row(
                         children: [
                           Flexible(
@@ -293,7 +293,7 @@ class _AddCSOScreenState extends State<AddCSOScreen> {
                             ),
                           ),
                         ],
-                      ),
+                      ),SizedBox(height: 20,),
                       Row(
                         children: [
                           Flexible(
@@ -328,7 +328,7 @@ class _AddCSOScreenState extends State<AddCSOScreen> {
                             ),
                           ),
                         ],
-                      ),
+                      ),SizedBox(height: 20,),
                       SizedBox(height: 20,),
                       TextButton(
                         child: Text(" Add ",
