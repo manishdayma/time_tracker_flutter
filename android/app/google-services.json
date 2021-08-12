@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "184734554246",
+    "project_id": "timesheet-ea68d",
+    "storage_bucket": "timesheet-ea68d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184734554246:android:313659b5c7c6c3a04dd907",
+        "android_client_info": {
+          "package_name": "com.time.tracker.time_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "184734554246-jgfodj2qe21m3kan40m1ptua7hm5t06e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhdPztSqYeDghOrCsUavpNfM4xEGLydrA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "184734554246-jgfodj2qe21m3kan40m1ptua7hm5t06e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

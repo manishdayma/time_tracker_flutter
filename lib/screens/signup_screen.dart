@@ -1,20 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker/constants/constants.dart';
 import 'package:time_tracker/screens/home_screen2.dart';
 import 'package:time_tracker/screens/manager/home_screen.dart';
-import 'package:time_tracker/screens/signup_screen.dart';
 import 'package:time_tracker/services/firestore_services.dart';
 
-class LoginScreen extends StatefulWidget {
+import 'login_screen.dart';
+class SignupScreen extends StatefulWidget {
   final bool ismanager;
-  const LoginScreen({Key? key, required this.ismanager}) : super(key: key);
+  const SignupScreen({Key? key, required this.ismanager}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   bool _obscureText = true;
   FirestoreService _firestoreService = FirestoreService();
   TextEditingController email = TextEditingController();
@@ -55,11 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         children: [
                           Text(
-                            "Login",
+                            "Sign Up",
                             style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold
+                                color: Colors.blue,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold
                             ),
                           ),
                           SizedBox(
@@ -72,14 +71,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               labelText: "Username",
                               enabledBorder: const OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                BorderRadius.all(Radius.circular(20.0)),
                                 borderSide: const BorderSide(
                                   color: Colors.grey,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
+                                BorderRadius.all(Radius.circular(10.0)),
                                 borderSide: BorderSide(color: Colors.blue),
                               ),
                             ),
@@ -88,20 +87,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 50,
                           ),
                           TextField(
-                            controller:password,
+                            controller: password,
                             decoration: new InputDecoration(
                               prefixIcon: Icon(Icons.person),
                               labelText: "Password",
                               enabledBorder: const OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                BorderRadius.all(Radius.circular(20.0)),
                                 borderSide: const BorderSide(
                                   color: Colors.grey,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
+                                BorderRadius.all(Radius.circular(10.0)),
                                 borderSide: BorderSide(color: Colors.blue),
                               ),
                               suffixIcon: IconButton(
@@ -119,46 +118,48 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 10,
                           ),
                           GestureDetector(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (_)=>SignupScreen(ismanager: widget.ismanager,)));
-                            },
-                              child: Text("Don't have an accont? Signup")
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (_)=>LoginScreen(ismanager: widget.ismanager,)));
+                              },
+                              child: Text("Already have an accont? Login")
                           ),
                           SizedBox(
                             height: 50,
                           ),
                           TextButton(
-                              child: Text("Login",
+                              child: Text("Create Account",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold)),
                               style: ButtonStyle(
                                   padding:
-                                      MaterialStateProperty.all<EdgeInsets>(
-                                          EdgeInsets.all(15)),
+                                  MaterialStateProperty.all<EdgeInsets>(
+                                      EdgeInsets.all(15)),
                                   foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.blue),
+                                  MaterialStateProperty.all<Color>(
+                                      Colors.blue),
                                   backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          appdarkColor),
+                                  MaterialStateProperty.all<Color>(
+                                      appdarkColor),
                                   shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    side: BorderSide(color: appdarkColor),
-                                  ))),
+                                        borderRadius: BorderRadius.circular(18.0),
+                                        side: BorderSide(color: appdarkColor),
+                                      ))),
                               onPressed: () {
-                                  checkLogin(email.text,password.text,widget.ismanager);
-                                  // widget.ismanager == true
-                                //     ? Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (_) => HomeScreen()))
-                                //     : Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (_) => HomeScreen2()));
+                                addUser(email.text,password.text,widget.ismanager);
+                                widget.ismanager == true
+                                    ? Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (BuildContext context) => HomeScreen()),
+                                        (Route<dynamic> route) => false
+                                )
+                                    : Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (BuildContext context) => HomeScreen2()),
+                                        (Route<dynamic> route) => false
+                                );
                               }),
                         ],
                       ),
@@ -173,10 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> checkLogin(String email,String password,bool isManager) async{
-    var checkLogin = _firestoreService.checkLogin(email, password, isManager);
-    print(checkLogin);
+  Future<void> addUser(String email,String password,bool isManager) async{
+    _firestoreService.addUser(email,password,isManager);
   }
-
-
 }
