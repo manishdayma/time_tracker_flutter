@@ -175,6 +175,6 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> addUser(String email,String password,bool isManager) async{
-    _firestoreService.addUser(email,password,isManager);
+    //_firestoreService.addUser(email,password,isManager);
   }
 }

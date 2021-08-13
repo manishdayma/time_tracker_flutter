@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_tracker/constants/constants.dart';
 import 'package:time_tracker/screens/home_screen2.dart';
 import 'package:time_tracker/screens/manager/home_screen.dart';
 import 'package:time_tracker/screens/signup_screen.dart';
 import 'package:time_tracker/services/firestore_services.dart';
+import 'package:uuid/uuid.dart';
 
 class LoginScreen extends StatefulWidget {
   final bool ismanager;
@@ -15,7 +17,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  var uuid = Uuid();
   bool _obscureText = true;
+  bool _existingUser = false;
   FirestoreService _firestoreService = FirestoreService();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -25,6 +29,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             "Login",
                             style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold
-                            ),
+                                color: Colors.blue,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
                             height: 20,
@@ -88,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 50,
                           ),
                           TextField(
-                            controller:password,
+                            controller: password,
                             decoration: new InputDecoration(
                               prefixIcon: Icon(Icons.person),
                               labelText: "Password",
@@ -118,12 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                             height: 10,
                           ),
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (_)=>SignupScreen(ismanager: widget.ismanager,)));
-                            },
-                              child: Text("Don't have an accont? Signup")
-                          ),
                           SizedBox(
                             height: 50,
                           ),
@@ -149,16 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     side: BorderSide(color: appdarkColor),
                                   ))),
                               onPressed: () {
-                                  checkLogin(email.text,password.text,widget.ismanager);
-                                  // widget.ismanager == true
-                                //     ? Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (_) => HomeScreen()))
-                                //     : Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (_) => HomeScreen2()));
+                                checkLogin();
                               }),
                         ],
                       ),
@@ -173,9 +168,46 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> checkLogin(String email,String password,bool isManager) async{
-    var checkLogin = _firestoreService.checkLogin(email, password, isManager);
-    print(checkLogin);
+  void checkLogin() {
+    FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email.text)
+        .get()
+        .then((QuerySnapshot querySnapshot) async {
+      print(querySnapshot.docs.length);
+      if (querySnapshot.docs.length == 0) {
+        var v4 = uuid.v4();
+        _firestoreService.addUser(v4.toString(),email.text,password.text,widget.ismanager);
+      } else {
+        querySnapshot.docs.forEach((doc) async {
+          print(doc.reference.id);
+          if (doc['password'] == password.text) {
+            print("login" +
+                doc['isManager'].toString());
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool("isLogin", true);
+            await prefs.setString("user", doc['uid']);
+            await prefs.setString("email", doc['email']);
+            await prefs.setBool("isManager", doc['isManager']);
+            doc['isManager'] == true
+                ? Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        HomeScreen()))
+                : Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        HomeScreen2()));
+          } else {
+            print("wrong pass");
+          }
+        });
+      }
+    }).onError((error, stackTrace) {
+      print(error);
+    });
   }
 
 
