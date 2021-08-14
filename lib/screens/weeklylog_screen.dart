@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker/constants/constants.dart';
 import 'package:time_tracker/screens/add_timesheet_screen.dart';
@@ -44,7 +45,6 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
                             fontWeight: FontWeight.bold),
                       ),
                     ),
-
                     SizedBox(
                       width: 10,
                     )
@@ -53,11 +53,12 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
               ),
               DropdownButton<String>(
                 dropdownColor: appdarkColor,
-                underline:  Container(
+                underline: Container(
                   height: 2,
                   color: appdarkColor,
                 ),
-                items: <String>['Select the week', 'week 1', 'week 2', 'week 3'].map((String value) {
+                items: <String>['Select the week', 'week 1', 'week 2', 'week 3']
+                    .map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: new Text(value),
@@ -67,46 +68,28 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
                 hint: Text("Select the week"),
               ),
               Expanded(
-                  child: ListView(
-                children: [
-                  ListTile(
-                    leading: GestureDetector(
-                      child: Icon(Icons.add_circle),
-                      onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (_)=>AddTimeSheetScreen())),
-                    ),
-                    title: Text(
-                        'JUNE 2021 - FOURTH WEEK ( 25/07/2021 - 31/07/2021 )'),
-                    trailing: Icon(Icons.delete),
-                    onTap: () {
-                      //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));
-                    },
-                  ),Divider(
-                    thickness: 1,
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.add_circle),
-                    title: Text(
-                        'JUNE 2021 - THIRD WEEK ( 25/07/2021 - 31/07/2021 )'),
-                    trailing: Icon(Icons.delete),
-                    onTap: () {
-                      //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));
-                    },
-                  ),Divider(
-                    thickness: 1,
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.add_circle),
-                    title: Text(
-                        'JUNE 2021 - SECOND WEEK ( 25/07/2021 - 31/07/2021 )'),
-                    trailing: Icon(Icons.delete),
-                    onTap: () {
-                      //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));
-                    },
-                  ),Divider(
-                    thickness: 1,
-                  ),
-                ],
-              )),
+                child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('weeks')
+                      // .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.data == null) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return ListView.builder(
+                      padding: EdgeInsets.all(10),
+                      // controller: _listScrollController,
+                      // reverse: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        // mention the arrow syntax if you get the time
+                        return WeekItem(snapshot.data!.docs[index]);
+                      },
+                    );
+                  },
+                ),
+              ),
               SizedBox(
                 height: 50,
               ),
@@ -114,6 +97,25 @@ class _WeeklyLogScreenState extends State<WeeklyLogScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget WeekItem(QueryDocumentSnapshot<Object?> doc) {
+    return ListTile(
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => AddTimeSheetScreen(
+                    weekid: doc.id,
+                  )));
+        },
+        child: Icon(Icons.add_circle),
+      ),
+      title: Text(doc['title']),
+      trailing: Icon(Icons.delete),
+      onTap: () {
+        //Navigator.push(context, MaterialPageRoute(builder: (_)=>AnalyticsScreen()));
+      },
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker/screens/splash.dart';
-import 'package:time_tracker/services/firestore_services.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();

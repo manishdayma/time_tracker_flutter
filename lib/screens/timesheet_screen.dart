@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker/constants/constants.dart';
 import 'package:time_tracker/screens/manager/analytics_screen.dart';
@@ -45,35 +46,38 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                     Center(
                       widthFactor: 3,
                       child: Text(
-                      "Timesheet",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold),
-                    ),
+                        "Timesheet",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
                 Expanded(
-                    child: ListView(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.check_box),
-                      title: Text(
-                          'JUNE 2021 - FOURTH WEEK ( 25/07/2021 - 31/07/2021 )'),
-                      trailing: Icon(Icons.delete),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => AnalyticsScreen()));
-                      },
-                    ),
-                    Divider(
-                      thickness: 1,
-                    ),
-                  ],
-                )),
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('weeks')
+                        // .orderBy('timestamp', descending: true)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.data == null) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      return ListView.builder(
+                        padding: EdgeInsets.all(10),
+                        // controller: _listScrollController,
+                        // reverse: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          // mention the arrow syntax if you get the time
+                          return WeekItem(snapshot.data!.docs[index]);
+                        },
+                      );
+                    },
+                  ),
+                ),
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 15),
                   child: Stack(
@@ -99,8 +103,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) =>
-                                        ApproveTimesheetScreen()));
+                                    builder: (_) => ApproveTimesheetScreen()));
                           },
                           child: Icon(Icons.navigate_next),
                         ),
@@ -116,6 +119,18 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget WeekItem(QueryDocumentSnapshot<Object?> doc) {
+    return ListTile(
+      leading: Icon(Icons.check_box),
+      title: Text(doc['title']),
+      trailing: Icon(Icons.delete),
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => AnalyticsScreen()));
+      },
     );
   }
 }

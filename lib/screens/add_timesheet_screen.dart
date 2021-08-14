@@ -1,10 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:time_tracker/constants/constants.dart';
 import 'package:time_tracker/screens/weeklylog_screen.dart';
+import 'package:uuid/uuid.dart';
 
 class AddTimeSheetScreen extends StatefulWidget {
-  const AddTimeSheetScreen({Key? key}) : super(key: key);
+  final String weekid;
+  const AddTimeSheetScreen({Key? key, required this.weekid}) : super(key: key);
 
   @override
   _AddTimeSheetScreenState createState() => _AddTimeSheetScreenState();
@@ -14,6 +19,20 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
   final dateController = TextEditingController();
   TextEditingController timeinput = TextEditingController();
   TextEditingController timeinput2 = TextEditingController();
+  TextEditingController description = TextEditingController();
+  String contract = "contract 1";
+  String activity = "activity 1";
+  String task = "task 1";
+  var v4 = Uuid().v4();
+  String userid = "";
+
+  @override
+  void initState() {
+    getuser();
+    getcontracts();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size _mediaQuery = MediaQuery.of(context).size;
@@ -57,6 +76,7 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(widget.weekid),
                       TextField(
                         readOnly: true,
                         controller: dateController,
@@ -111,7 +131,7 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                       ),
                       TextField(
                         controller:
-                            timeinput, //editing controller of this TextField
+                            timeinput2, //editing controller of this TextField
                         decoration: InputDecoration(
                             icon: Icon(Icons.timer), //icon of text field
                             labelText: "To" //label text of field
@@ -157,6 +177,7 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                         ),
                         child: DropdownButton<String>(
                           dropdownColor: appdarkColor,
+                          value: contract,
                           items: <String>[
                             'contract 1',
                             'contract 2',
@@ -167,7 +188,10 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                               child: new Text(value),
                             );
                           }).toList(),
-                          onChanged: (_) {},
+                          onChanged: (String? newval) {
+                            contract = newval!;
+                            setState(() {});
+                          },
                           isExpanded: true,
                           hint: Text(" Select the contract"),
                         ),
@@ -195,7 +219,10 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                               child: new Text(value),
                             );
                           }).toList(),
-                          onChanged: (_) {},
+                          onChanged: (String? newval) {
+                            activity = newval!;
+                            setState(() {});
+                          },
                           isExpanded: true,
                           hint: Text(" Activity"),
                         ),
@@ -220,13 +247,17 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                               child: new Text(value),
                             );
                           }).toList(),
-                          onChanged: (_) {},
+                          onChanged: (String? newval) {
+                            task = newval!;
+                            setState(() {});
+                          },
                           isExpanded: true,
                           hint: Text(" Task"),
                         ),
                       ),
                       Center(
                         child: TextField(
+                          controller: description,
                           keyboardType: TextInputType.multiline,
                           maxLength: null,
                           maxLines: 2,
@@ -250,18 +281,38 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
                                   EdgeInsets.all(15)),
                               foregroundColor:
                                   MaterialStateProperty.all<Color>(Colors.blue),
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(appdarkColor),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  appdarkColor),
                               shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(RoundedRectangleBorder(
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
                                 side: BorderSide(color: appdarkColor),
                               ))),
                           onPressed: () => {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => WeeklyLogScreen())),
+                            FirebaseFirestore.instance
+                                .collection('timesheet')
+                                .doc(v4.toString())
+                                .set({
+                              'id': v4.toString(),
+                              'weekid': widget.weekid, // John Doe
+                              'date': dateController.text, // Stokes and Sons
+                              'from': timeinput.text,
+                              'to': timeinput2.text,
+                              'contract': contract,
+                              'activity': activity,
+                              'task': task,
+                              'description': description.text,
+                              'approved': 0,
+                              'userid': userid,
+                            }).then((value) {
+                              Fluttertoast.showToast(msg: "timesheet created");
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => WeeklyLogScreen()));
+                            }).catchError((error) =>
+                                    print("Failed to add user: $error"))
                           },
                         ),
                       ),
@@ -282,5 +333,21 @@ class _AddTimeSheetScreenState extends State<AddTimeSheetScreen> {
         initialDate: new DateTime.now(),
         firstDate: new DateTime(2016),
         lastDate: new DateTime(2021));
+  }
+
+  void getcontracts() {
+    FirebaseFirestore.instance
+        .collection('contracts')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) async {
+        print(doc.data());
+      });
+    });
+  }
+
+  Future<void> getuser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userid = prefs.getString('user')!;
   }
 }
